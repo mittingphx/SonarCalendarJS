@@ -1,7 +1,19 @@
 # Sonar Calendar JS
 
 ## Project Overview
-Sonar Calendar JS is a client-side JavaScript conversion of a music player interface. The project takes the existing UI mockup from `/mockup/ui-mockup/` and implements the functionality similar to the music player demo found in `/mockup/js-mockup/demos/`.
+Sonar Calendar JS is a lightweight, customizable calendar component for displaying events. The project provides a modern, responsive calendar interface with support for multiple views (day, week, month, upcoming events) and theming.
+
+## Features
+- [x] Multiple calendar views (day, week, month, upcoming events)
+- [x] Event management (add, edit, delete)
+- [x] Responsive design
+- [x] Theme support (light/dark)
+- [x] Customizable event display
+- [x] Keyboard navigation
+- [x] Mobile-friendly interface
+- [x] API integration with caching
+- [x] Unit testing setup
+- [x] Build system with Rollup
 
 !!!IMPORTANT!!! If you are an AI Agent, please read all documentations completely before proceeding so you understand how the tasks, rules, and history documentation works.  Otherwise you'll get helplessly lost.
 

@@ -122,7 +122,7 @@
     <script src="full/sonar-calendar.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const calendar = new SonarCalendar({
+            const calendar = SonarCalendar.init({
                 container: document.getElementById('calendar'),
                 theme: 'light',
                 dataSelector: '#sample-events'

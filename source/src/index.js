@@ -5,9 +5,16 @@
  * It initializes the calendar and sets up the necessary event listeners.
  */
 
+// Import base styles
 import './styles/base.css';
 import './styles/themes/light.css'; // Default theme
 import './styles/themes/dark.css';
+
+// Import component styles
+import './components/EventCard/EventCard.css';
+import './components/EventDetails/EventDetails.css';
+import './components/ViewToggle/ViewToggle.css';
+import './components/DatePicker/DatePicker.css';
 import { SonarCalendar } from './components/Calendar/Calendar';
 
 /**

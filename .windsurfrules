@@ -6,3 +6,5 @@ If any rule is blocking your ability to compelte a task, suggest updating the ru
 Make sure to update AGENT-RULES.md to remember rules it has been given that it should continue to follow.
 Always update AGENT-HISTORY.md to log the work the AI has done.
 
+Update AGENT-HISTORY.md to log the work the AI has done after each step.
+Update TASKS.md to log the work the AI has done after each step.

@@ -5,9 +5,12 @@
  * view management, and API interactions.
  */
 
-import { EventCard } from '../EventCard';
-import { EventDetails } from '../EventDetails';
-import { ViewToggle } from '../ViewToggle';
+import { EventCard } from '../EventCard/EventCard';
+import { EventDetails } from '../EventDetails/EventDetails';
+import { ViewToggle } from '../ViewToggle/ViewToggle';
+import { DatePicker } from '../DatePicker/DatePicker';
+import { eventService } from '../../services/eventService';
+import { handleApiError } from '../../utils/errorHandler';
 
 export class SonarCalendar {
   /**
@@ -43,8 +46,9 @@ export class SonarCalendar {
     // Initialize the calendar
     this.initialize();
     
-    // Set up view change handler
+    // Set up handlers
     this.handleViewChange = this.handleViewChange.bind(this);
+    this.handleDateChange = this.handleDateChange.bind(this);
   }
 
 
@@ -54,7 +58,7 @@ export class SonarCalendar {
    */
   initialize() {
     // Apply theme
-    this.applyTheme(this.theme);
+    this.setTheme(this.theme);
     
     // Set up the container
     this.container.innerHTML = `
@@ -100,9 +104,12 @@ export class SonarCalendar {
     const header = document.createElement('div');
     header.className = 'calendar-header';
     
-    const title = document.createElement('h2');
-    title.className = 'calendar-title';
-    title.textContent = this.formatMonthYear(this.currentDate);
+    // Create date picker
+    this.datePicker = new DatePicker({
+      initialDate: this.currentDate,
+      onChange: this.handleDateChange,
+      theme: this.theme
+    });
     
     // Create view toggle
     this.viewToggle = new ViewToggle({
@@ -111,17 +118,23 @@ export class SonarCalendar {
       theme: this.theme
     });
     
+    // Create header content container
     const headerContent = document.createElement('div');
     headerContent.className = 'calendar-header__content';
-    headerContent.appendChild(title);
     
-    header.appendChild(headerContent);
+    // Add date picker to header
+    const datePickerContainer = document.createElement('div');
+    datePickerContainer.className = 'calendar-date-picker';
+    this.datePicker.render(datePickerContainer);
+    headerContent.appendChild(datePickerContainer);
     
     // Add view toggle to header
     const viewToggleContainer = document.createElement('div');
     viewToggleContainer.className = 'calendar-view-toggle';
     this.viewToggle.render(viewToggleContainer);
-    header.appendChild(viewToggleContainer);
+    headerContent.appendChild(viewToggleContainer);
+    
+    header.appendChild(headerContent);
     
     return header.outerHTML;
   }
@@ -144,10 +157,22 @@ export class SonarCalendar {
       }
       
       .calendar-header {
+        margin-bottom: 1.5rem;
+      }
+      
+      .calendar-header__content {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1.5rem;
+        gap: 1rem;
+      }
+      
+      .calendar-date-picker {
+        flex: 1;
+      }
+      
+      .calendar-view-toggle {
+        flex-shrink: 0;
       }
       
       .calendar-header__content {
@@ -192,7 +217,7 @@ export class SonarCalendar {
     if (this.viewToggle) {
       this.viewToggle.setTheme(theme);
     }
-    this.render();
+    this.updateCalendar();
   }
 
   /**
@@ -270,15 +295,37 @@ export class SonarCalendar {
    * @private
    */
   handlePopState() {
-    if (window.location.hash.startsWith('#event-')) {
-      const eventId = window.location.hash.replace('#event-', '');
-      const event = this.events.find(e => e.id.toString() === eventId);
+    const eventId = window.location.hash.replace('#event-', '');
+    if (eventId) {
+      const event = this.events.find(e => e.id === eventId);
       if (event) {
         this.showEventDetails(event);
       }
-    } else if (this.activeEvent) {
+    } else {
       this.closeEventDetails();
     }
+  }
+
+  /**
+   * Handle view change events from the view toggle
+   * @param {string} view - The new view to switch to
+   * @private
+   */
+  handleViewChange(view) {
+    if (['upcoming', 'month', 'week', 'day'].includes(view)) {
+      this.currentView = view;
+      this.updateCalendar();
+    }
+  }
+
+  /**
+   * Handle date change from date picker
+   * @param {Date} date - The newly selected date
+   * @private
+   */
+  handleDateChange(date) {
+    this.currentDate = new Date(date);
+    this.updateCalendar();
   }
 
   /**
@@ -286,26 +333,26 @@ export class SonarCalendar {
    * @param {number} direction - The direction to navigate (-1 for previous, 1 for next)
    */
   navigate(direction) {
-    const newDate = new Date(this.currentDate);
-    newDate.setMonth(newDate.getMonth() + direction);
-    this.currentDate = newDate;
+    this.currentDate.setMonth(this.currentDate.getMonth() + direction);
+    if (this.datePicker) {
+      this.datePicker.setDate(this.currentDate);
+    }
     this.updateCalendar();
   }
 
   /**
    * Parse events from a data source
    * @param {string} source - The source of the data ('api' or 'element')
+   * @param {Object} [filters] - Optional filters to apply
    * @returns {Promise<Array>} - Parsed events array
    * @private
    */
-  async parseEvents(source) {
+  async parseEvents(source, filters = {}) {
     try {
       if (source === 'api' && this.apiUrl) {
-        const response = await fetch(this.apiUrl);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return await response.json();
+        // Use the event service to fetch events
+        const events = await eventService.getEvents(filters);
+        return this.processEvents(events);
       } else if (source === 'element' && this.dataSelector) {
         const element = document.querySelector(this.dataSelector);
         if (!element) {
@@ -318,7 +365,8 @@ export class SonarCalendar {
           throw new Error('No data found in the specified element');
         }
         
-        return JSON.parse(data);
+        const events = JSON.parse(data);
+        return this.processEvents(events);
       }
       return [];
     } catch (error) {
@@ -328,9 +376,34 @@ export class SonarCalendar {
   }
 
   /**
-   * Load events from the available data source
+   * Process events data
+   * @param {Array} events - Array of event objects
+   * @returns {Array} - Processed events
+   * @private
    */
-  async loadEvents() {
+  processEvents(events) {
+    if (!Array.isArray(events)) {
+      console.warn('Expected an array of events, got:', events);
+      return [];
+    }
+
+    return events.map(event => ({
+      id: event.id || `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      title: event.title || 'Untitled Event',
+      start: event.start ? new Date(event.start) : new Date(),
+      end: event.end ? new Date(event.end) : new Date(),
+      description: event.description || '',
+      location: event.location || '',
+      category: event.category || 'default',
+      ...event
+    }));
+  }
+
+  /**
+   * Load events from the available data source
+   * @param {Object} [filters] - Optional filters to apply
+   */
+  async loadEvents(filters = {}) {
     this.isLoading = true;
     this.error = null;
     this.updateLoadingState();
@@ -338,11 +411,11 @@ export class SonarCalendar {
     try {
       // Try to load from API first if available
       if (this.apiUrl) {
-        this.events = await this.parseEvents('api');
+        this.events = await this.parseEvents('api', filters);
       } 
       // If no API URL or API failed, try loading from data element if specified
       else if (this.dataSelector) {
-        this.events = await this.parseEvents('element');
+        this.events = await this.parseEvents('element', filters);
       } else {
         this.events = [];
         console.warn('No data source specified. Provide either apiUrl or dataSelector.');
@@ -350,7 +423,7 @@ export class SonarCalendar {
       
       this.updateCalendar();
     } catch (error) {
-      console.error('Error loading events:', error);
+      handleApiError(error, 'Loading events');
       this.error = error.message;
       this.showError(error.message);
     } finally {
