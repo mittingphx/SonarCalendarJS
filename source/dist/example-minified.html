@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sonar Calendar - Minified Version Example</title>
+    <link rel="stylesheet" href="minified/sonar-calendar.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            margin: 0;
+            padding: 2rem;
+            line-height: 1.5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #1d4ed8;
+            margin-bottom: 2rem;
+        }
+        #calendar {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            min-height: 600px;
+        }
+        .info {
+            background: #f0fdf4;
+            border-left: 4px solid #10b981;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border-radius: 0 0.375rem 0.375rem 0;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 0.2em 0.4em;
+            border-radius: 0.25em;
+            font-size: 0.9em;
+            font-family: 'SFMono-Regular', Consolas, monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sonar Calendar - Minified Version</h1>
+        
+        <div class="info">
+            <p>This example uses the minified version of the Sonar Calendar library for production use.</p>
+            <p>Files used:
+                <ul>
+                    <li><code>minified/sonar-calendar.min.js</code> - Minified UMD bundle</li>
+                    <li><code>minified/sonar-calendar.min.css</code> - Minified styles</li>
+                </ul>
+            </p>
+        </div>
+        
+        <div id="calendar"></div>
+
+        <div class="info">
+            <h3>Example Data Source</h3>
+            <p>This example shows how to load data from a hidden element on the page.</p>
+            
+            <div class="example-data-source">
+                <h4>Data Source (hidden element):</h4>
+                <pre id="sample-events" style="display: none;">
+[
+  {
+    "id": 1,
+    "title": "Team Meeting",
+    "start": "2025-05-15T10:00:00",
+    "end": "2025-05-15T11:30:00",
+    "description": "Weekly team sync to discuss project progress and blockers.",
+    "category": "Meeting"
+  },
+  {
+    "id": 2,
+    "title": "Lunch with Client",
+    "start": "2025-05-16T12:00:00",
+    "end": "2025-05-16T13:30:00",
+    "description": "Discuss project requirements and gather feedback on latest deliverables.",
+    "category": "Meeting"
+  },
+  {
+    "id": 3,
+    "title": "Code Review",
+    "start": "2025-05-17T14:00:00",
+    "end": "2025-05-17T16:00:00",
+    "description": "Review pull requests and provide feedback to the development team.",
+    "category": "Workshop"
+  },
+  {
+    "id": 4,
+    "title": "Product Demo",
+    "start": "2025-05-20T09:00:00",
+    "end": "2025-05-20T10:00:00",
+    "description": "Demonstrate new features to stakeholders.",
+    "category": "Conference"
+  },
+  {
+    "id": 5,
+    "title": "Team Building",
+    "start": "2025-05-22T15:00:00",
+    "end": "2025-05-22T17:00:00",
+    "description": "Team building activities and games.",
+    "category": "Concert"
+  }
+]
+                </pre>
+                
+                <h4>Or from a hidden input field:</h4>
+                <input type="hidden" id="events-input" value='[{"id":4,"title":"Another Event","start":"2025-05-18T09:00:00","end":"2025-05-18T10:00:00","description":"Sample event from input"}]'>
+            </div>
+        </div>
+    </div>
+
+    <script src="minified/sonar-calendar.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the calendar with data from a hidden element
+            var calendar1 = SonarCalendar.init({
+                selector: '#calendar',
+                theme: 'light',
+                dataSelector: '#sample-events' // Load data from the hidden pre element
+            });
+            
+            // Uncomment to load from the hidden input instead
+            /*
+            var calendar2 = SonarCalendar.init({
+                selector: '#calendar',
+                theme: 'light',
+                dataSelector: '#events-input' // Load data from a hidden input field
+            });
+            */
+        });
+    </script>
+</body>
+</html>

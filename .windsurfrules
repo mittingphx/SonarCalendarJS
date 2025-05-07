@@ -1,0 +1,8 @@
+Refer to README.md in the project root for instructions about the project. 
+Refer to AGENT-RULES.md in the project root for instructions about the agent rules.
+Make sure to check off completed tasks in the /docs/TASKS.md file.
+Always follow the rules set in AGENT-RULES.md. 
+If any rule is blocking your ability to compelte a task, suggest updating the rule in AGENT-RULES.md.
+Make sure to update AGENT-RULES.md to remember rules it has been given that it should continue to follow.
+Always update AGENT-HISTORY.md to log the work the AI has done.
+

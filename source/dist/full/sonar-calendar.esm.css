@@ -1,0 +1,86 @@
+:root {
+  /* Base spacing unit */
+  --spacing-unit: 0.5rem;
+  
+  /* Typography */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  
+  /* Border radius */
+  --radius-sm: calc(var(--spacing-unit) * 0.5);
+  --radius-md: var(--spacing-unit);
+  --radius-lg: calc(var(--spacing-unit) * 2);
+  
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 400ms ease;
+}
+
+/* Base reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Base typography */
+body {
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Utility classes */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-unit);
+}
+
+/* Theme variables will be imported from themes/ */
+
+:root {
+  /* Colors */
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-primary-active: #1d4ed8;
+  
+  --color-text: #1f2937;
+  --color-text-muted: #6b7280;
+  --color-text-inverse: #ffffff;
+  
+  --color-bg: #ffffff;
+  --color-bg-elevated: #f9fafb;
+  --color-bg-hover: #f3f4f6;
+  
+  --color-border: #e5e7eb;
+  --color-border-hover: #d1d5db;
+  
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/*# sourceMappingURL=sonar-calendar.esm.css.map */

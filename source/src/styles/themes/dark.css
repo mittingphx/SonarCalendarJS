@@ -1,0 +1,26 @@
+:root {
+  /* Colors */
+  --color-primary: #60a5fa;
+  --color-primary-hover: #3b82f6;
+  --color-primary-active: #2563eb;
+  
+  --color-text: #f9fafb;
+  --color-text-muted: #9ca3af;
+  --color-text-inverse: #1f2937;
+  
+  --color-bg: #111827;
+  --color-bg-elevated: #1f2937;
+  --color-bg-hover: #374151;
+  
+  --color-border: #374151;
+  --color-border-hover: #4b5563;
+  
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.5);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
+}

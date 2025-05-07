@@ -1,0 +1,222 @@
+/* Event Details Component Styles */
+
+.event-details {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.event-details--visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.event-details--closing {
+  opacity: 0;
+}
+
+.event-details__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1;
+}
+
+.event-details__content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background-color: var(--color-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 1.5rem;
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+}
+
+.event-details--visible .event-details__content {
+  transform: translateY(0);
+}
+
+.event-details__close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all var(--transition-fast);
+}
+
+.event-details__close:hover {
+  color: var(--color-text);
+  background-color: var(--color-bg-hover);
+}
+
+.event-details__header {
+  margin-bottom: 1.5rem;
+  padding-right: 2rem;
+}
+
+.event-details__category {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-inverse);
+  background-color: var(--color-primary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  margin-bottom: 0.75rem;
+}
+
+.event-details__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0.5rem 0 0;
+  line-height: 1.3;
+}
+
+.event-details__info {
+  background-color: var(--color-bg-elevated);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.event-details__info-item {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.event-details__info-item:last-child {
+  margin-bottom: 0;
+}
+
+.event-details__info-label {
+  font-weight: 600;
+  color: var(--color-text);
+  margin-right: 0.5rem;
+  min-width: 80px;
+}
+
+.event-details__duration {
+  color: var(--color-text-muted);
+  font-size: 0.9em;
+  margin-left: 0.5rem;
+}
+
+.event-details__description {
+  margin-bottom: 1.5rem;
+}
+
+.event-details__description h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 0.75rem;
+}
+
+.event-details__description p {
+  color: var(--color-text);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.event-details__actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: 1px solid transparent;
+}
+
+.btn--primary {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-color: var(--color-primary);
+}
+
+.btn--primary:hover {
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+
+.btn--secondary {
+  background-color: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-border);
+}
+
+.btn--secondary:hover {
+  background-color: var(--color-bg-hover);
+}
+
+/* Dark theme adjustments */
+.event-details.theme-dark .event-details__info {
+  background-color: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .event-details__content {
+    padding: 1rem;
+  }
+  
+  .event-details__info-item {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .event-details__info-label {
+    min-width: 100%;
+  }
+  
+  .event-details__actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+}
