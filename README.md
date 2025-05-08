@@ -26,13 +26,47 @@ The client wants to have something like this as the output of this project: http
 
 
 ## Project Structure
-- `/mockup/` - Contains the original mockup and reference implementations
-  - `/ui-mockup/` - Original UI design mockups
-  - `/js-mockup/` - Reference JavaScript implementation (server-side Node.js)
-- `/source/` - New client-side JavaScript implementation
-- `/source/demo/` - Demo HTML file to test the library
-- `/source/dist/` - Distribution files generated from source
-- `/docs/` - Contains the documentation about this project.
+```
+SonarCalendarJS/
+├── docs/                    # Project documentation
+│   ├── AGENT-HISTORY.md    # Agent interaction history
+│   ├── AGENT-RULES.md      # Rules for AI agents
+│   ├── ARCHITECTURE.md     # System architecture
+│   ├── BUILD.md            # Build system documentation
+│   └── TASKS.md            # Task tracking
+├── mockup/                 # Reference only (do not modify)
+│   ├── ui-mockup/         # Original UI design mockups
+│   └── js-mockup/         # Reference implementation (server-side Node.js)
+└── source/                # Source code (all new development goes here)
+    ├── build/             # Build configuration and scripts
+    ├── demo/              # Demo HTML file to test the library
+    ├── dist/              # Distribution files (generated)
+    │   ├── full/         # Full, unminified build
+    │   ├── minified/      # Minified production build
+    │   └── images/        # Image assets
+    ├── examples/          # Example implementations
+    └── src/               # Source files
+        ├── components/    # React/Vue components
+        │   ├── Calendar/  # Main calendar component
+        │   ├── DatePicker/
+        │   ├── EventCard/
+        │   ├── EventDetails/
+        │   └── ViewToggle/
+        ├── services/     # API and data services
+        ├── styles/        # CSS and theme files
+        │   └── themes/    # Theme definitions
+        ├── utils/         # Utility functions
+        └── __tests__/     # Test files
+```
+
+### Key Directories
+- **/docs/**: Contains all project documentation including architecture, tasks, and agent rules.
+- **/mockup/**: Reference implementation and designs (read-only).
+- **/source/**: All new development happens here.
+  - **/build/**: Build configuration and scripts.
+  - **/dist/**: Generated distribution files (do not edit directly).
+  - **/examples/**: Example implementations and usage.
+  - **/src/**: Source code organized by feature/functionality.
 
 ## Agent Rules
 Agent rules are stored in `docs/AGENT-RULES.md`
