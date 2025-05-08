@@ -10,7 +10,8 @@ NC='\033[0m' # No Color
 # Project directories
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOURCE_DIR="${SCRIPT_DIR}/source"
-BUILD_SCRIPT="${SOURCE_DIR}/build/build.ps1"
+BUILD_DIR="${SOURCE_DIR}/build"
+BUILD_SCRIPT="${BUILD_DIR}/build.ps1"
 DIST_DIR="${SOURCE_DIR}/dist"
 
 # Print header
@@ -86,20 +87,20 @@ install_powershell_linux() {
 # Install build dependencies
 install_build_deps() {
     local original_dir="$(pwd)"
-    local root_dir="${SCRIPT_DIR}"
+    local root_dir="${BUILD_DIR}"
     
     echo -e "${BLUE}🔧 Installing build dependencies...${NC}"
     
-    # Check if package.json exists in source directory, if not use root directory
-    if [ ! -f "${SOURCE_DIR}/package.json" ] && [ -f "${root_dir}/package.json" ]; then
+    # Check if package.json exists in build directory only
+    if [ ! -f "${root_dir}/package.json" ]; then
         echo -e "${YELLOW}⚠️  package.json not found in source directory, using root directory${NC}"
-        cd "${root_dir}" || error_exit "Failed to change to root directory"
+        cd ${original_dir} || error_exit "Failed to change to original directory"
+        error_exit "package.json must be in the build folder"
     else
-        # Change to source directory
-        cd "${SOURCE_DIR}" || error_exit "Failed to change to source directory"
+        cd "${root_dir}" || error_exit "Failed to change to build directory"
     fi
     
-    # Verify we have a package.json in the current directory
+    # Verify we have a package.json in the current directory    
     if [ ! -f "package.json" ]; then
         error_exit "package.json not found in $(pwd)"
     fi
@@ -140,7 +141,7 @@ install_build_deps() {
 # Build the project
 build_project() {
     local original_dir="$(pwd)"
-    local root_dir="${SCRIPT_DIR}"
+    local root_dir="${BUILD_DIR}"
     
     # Ensure we're in the project root
     cd "${root_dir}" || error_exit "Failed to change to project root"
@@ -148,7 +149,7 @@ build_project() {
     echo -e "${BLUE}🚀 Building project...${NC}"
     
     # Check for bash build script first (future compatibility)
-    local bash_build_script="${SOURCE_DIR}/build/build.sh"
+    local bash_build_script="build.sh"
     
     # Install dependencies first
     install_build_deps
@@ -171,28 +172,32 @@ build_project() {
         fi
         
         # Determine the correct path for the build script
-        local build_script_path="${SOURCE_DIR}/build"
+        local build_script_path="${BUILD_DIR}/build.ps1"
+        
+        # Store the original path for display
+        local display_path="${build_script_path}"
         
         # Convert WSL path to Windows path if running under WSL
         if [[ "${build_script_path}" == "/mnt/"* ]]; then
-            # Convert /mnt/c/... to C:\\...
+            # Convert /mnt/c/... to C:/
             build_script_path="${build_script_path#/mnt/}"  # Remove /mnt/
-            build_script_path="${build_script_path:0:1}:${build_script_path:1}"  # Add : after drive letter
-            build_script_path="${build_script_path////\\}"  # Replace / with \
+            build_script_path="/mnt/${build_script_path}"    # Add /mnt/ back for WSL
+            display_path="${build_script_path}"
+        fi
+        
+        # Verify the build script exists
+        if [ ! -f "${build_script_path}" ]; then
+            error_exit "Build script not found at: ${build_script_path}"
         fi
         
         # Run PowerShell build script
-        echo -e "${BLUE}📦 Running build script from: ${build_script_path}${NC}"
+        echo -e "${BLUE}📦 Running build script from: ${display_path}${NC}"
         
-        # Change to the directory containing package.json
-        if [ -f "${root_dir}/package.json" ]; then
-            cd "${root_dir}" || error_exit "Failed to change to root directory"
-        else
-            cd "${SOURCE_DIR}" || error_exit "Failed to change to source directory"
-        fi
+        # Change to the build directory
+        cd "${BUILD_DIR}" || error_exit "Failed to change to build directory"
         
-        # Run the build script
-        if ! pwsh -ExecutionPolicy Bypass -File "${build_script_path}\\build.ps1"; then
+        # Run the build script with the correct path format for PowerShell
+        if ! pwsh -ExecutionPolicy Bypass -File "./build.ps1"; then
             cd "$original_dir"
             error_exit "Build script failed"
         fi
