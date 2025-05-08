@@ -93,7 +93,7 @@ install_build_deps() {
     
     # Check if package.json exists in build directory only
     if [ ! -f "${root_dir}/package.json" ]; then
-        echo -e "${YELLOW}⚠️  package.json not found in source directory, using root directory${NC}"
+        echo -e "${YELLOW}⚠️  package.json not found in build directory${NC}"
         cd ${original_dir} || error_exit "Failed to change to original directory"
         error_exit "package.json must be in the build folder"
     else
@@ -111,8 +111,15 @@ install_build_deps() {
     echo -e "${BLUE}🧹 Cleaning npm cache...${NC}"
     npm cache clean --force
     
+    # Install required global dependencies if missing
+    echo -e "${BLUE}🌍 Checking for global dependencies...${NC}"
+    if ! npm list -g autoprefixer postcss rollup rollup-plugin-terser rollup-plugin-postcss rollup-plugin-node-resolve rollup-plugin-commonjs @rollup/plugin-json @rollup/plugin-node-resolve @rollup/plugin-commonjs &>/dev/null; then
+        echo -e "${YELLOW}⚠️  Installing missing global dependencies...${NC}"
+        npm install -g autoprefixer postcss rollup rollup-plugin-terser rollup-plugin-postcss rollup-plugin-node-resolve rollup-plugin-commonjs @rollup/plugin-json @rollup/plugin-node-resolve @rollup/plugin-commonjs
+    fi
+    
     # Install dependencies
-    echo -e "${BLUE}📥 Installing dependencies...${NC}"
+    echo -e "${BLUE}📥 Installing project dependencies...${NC}"
     if ! npm install --no-fund --no-audit; then
         error_exit "Failed to install dependencies"
     fi
@@ -123,15 +130,16 @@ install_build_deps() {
         error_exit "Failed to install dev dependencies"
     fi
     
-    # Install any missing dependencies from package.json
-    echo -e "${BLUE}🔍 Verifying dependencies...${NC}"
-    if [ -f "package.json" ]; then
-        if ! npm ci --no-fund --no-audit; then
-            echo -e "${YELLOW}⚠️  'npm ci' failed, trying 'npm install'...${NC}"
-            if ! npm install --no-fund --no-audit; then
-                error_exit "Failed to install project dependencies"
-            fi
-        fi
+    # Install specific required dependencies
+    echo -e "${BLUE}📦 Installing required build dependencies...${NC}"
+    npm install --save-dev autoprefixer postcss rollup rollup-plugin-terser rollup-plugin-postcss rollup-plugin-node-resolve rollup-plugin-commonjs @rollup/plugin-json @rollup/plugin-node-resolve @rollup/plugin-commonjs
+    
+    # Verify all required dependencies are installed
+    echo -e "${BLUE}🔍 Verifying all dependencies are installed...${NC}"
+    if ! npm list autoprefixer postcss rollup rollup-plugin-terser rollup-plugin-postcss rollup-plugin-node-resolve rollup-plugin-commonjs @rollup/plugin-json @rollup/plugin-node-resolve @rollup/plugin-commonjs &>/dev/null; then
+        echo -e "${YELLOW}⚠️  Some dependencies are still missing, trying a full reinstall...${NC}"
+        rm -rf node_modules package-lock.json
+        npm install --no-fund --no-audit
     fi
     
     # Return to original directory
@@ -199,7 +207,7 @@ build_project() {
         # Run the build script with the correct path format for PowerShell
         if ! pwsh -ExecutionPolicy Bypass -File "./build.ps1"; then
             cd "$original_dir"
-            error_exit "Build script failed"
+            error_exit "Build script source/build/build.ps1 failed"
         fi
     fi
     
