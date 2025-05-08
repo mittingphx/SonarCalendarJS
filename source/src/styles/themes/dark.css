@@ -7,7 +7,10 @@
   --color-text: #f9fafb;
   --color-text-muted: #9ca3af;
   --color-text-inverse: #1f2937;
-  
+
+  --color-text-secondary: #9ca3af;
+  --color-text-secondary-hover: #6b7280;
+
   --color-bg: #111827;
   --color-bg-elevated: #1f2937;
   --color-bg-hover: #374151;

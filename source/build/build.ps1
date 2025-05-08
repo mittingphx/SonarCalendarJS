@@ -3,21 +3,29 @@
 # Set paths
 $scriptPath = $PSScriptRoot
 $rootPath = Split-Path -Parent $scriptPath
-$distDir = "$rootPath\dist"
-$nodePath = "C:\Program Files\nodejs\node.exe"
-$npmPath = "C:\Program Files\nodejs\npm.cmd"
+$distDir = Join-Path $rootPath "dist"
+
+# Platform-specific paths
+if ($IsWindows -or ($PSVersionTable.PSVersion.Major -lt 6 -and -not $IsLinux -and -not $IsMacOS)) {
+    # Windows
+    $nodePath = "C:\Program Files\nodejs\node.exe"
+    $npmPath = "C:\Program Files\nodejs\npm.cmd"
+} else {
+    # Linux/MacOS
+    $nodePath = "node"
+    $npmPath = "npm"
+}
 
 # Change to the build directory
-Set-Location -Path $scriptPath
+Set-Location -Path $scriptPath | Out-Null
 
 # Check if Node.js is installed
-if (-not (Test-Path $nodePath)) {
-    Write-Error "[ERROR] Node.js not found at $nodePath"
+$nodeVersion = & $nodePath --version 2>$null
+if (-not $?) {
+    Write-Error "[ERROR] Node.js is not installed or not in PATH. Please install Node.js and try again."
     exit 1
 }
 
-# Get Node.js version
-$nodeVersion = & $nodePath --version
 Write-Host "[OK] Node.js version: $nodeVersion"
 
 # Get npm version
@@ -26,7 +34,7 @@ Write-Host "[OK] npm version: $npmVersion"
 
 # Install dependencies
 Write-Host "[INFO] Installing dependencies..."
-& $npmPath install
+& $npmPath install --no-fund --no-audit
 if ($LASTEXITCODE -ne 0) {
     Write-Error "[ERROR] Failed to install dependencies"
     exit 1

@@ -13,57 +13,51 @@ error_exit() {
     exit 1
 }
 
-# Get the directory where this script is located
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
 # Main installation function
 install_dependencies() {
     echo -e "${BLUE}🔧 Installing build dependencies...${NC}"
     
-    # Verify we have a package.json in the current directory    
+    # Ensure we're in a Node.js project
     if [ ! -f "package.json" ]; then
         error_exit "package.json not found in $(pwd)"
     fi
     
-    echo -e "${BLUE}📦 Installing dependencies in $(pwd)...${NC}"
-    
-    # Clean npm cache to avoid potential issues
     echo -e "${BLUE}🧹 Cleaning npm cache...${NC}"
     npm cache clean --force
-    
-    # Install required global dependencies if missing
-    echo -e "${BLUE}🌍 Checking for global dependencies...${NC}"
-    if ! npm list -g autoprefixer postcss rollup rollup-plugin-terser rollup-plugin-postcss rollup-plugin-node-resolve rollup-plugin-commonjs @rollup/plugin-json @rollup/plugin-node-resolve @rollup/plugin-commonjs &>/dev/null; then
-        echo -e "${YELLOW}⚠️  Installing missing global dependencies...${NC}"
-        npm install -g autoprefixer postcss rollup rollup-plugin-terser rollup-plugin-postcss rollup-plugin-node-resolve rollup-plugin-commonjs @rollup/plugin-json @rollup/plugin-node-resolve @rollup/plugin-commonjs
-    fi
-    
-    # Install dependencies
-    echo -e "${BLUE}📥 Installing project dependencies...${NC}"
-    if ! npm install --no-fund --no-audit; then
-        error_exit "Failed to install dependencies"
-    fi
-    
-    # Install dev dependencies
-    echo -e "${BLUE}📥 Installing dev dependencies...${NC}"
-    if ! npm install --save-dev --no-fund --no-audit; then
-        error_exit "Failed to install dev dependencies"
-    fi
-    
-    # Install specific required dependencies
-    echo -e "${BLUE}📦 Installing required build dependencies...${NC}"
-    npm install --save-dev autoprefixer postcss rollup rollup-plugin-terser rollup-plugin-postcss rollup-plugin-node-resolve rollup-plugin-commonjs @rollup/plugin-json @rollup/plugin-node-resolve @rollup/plugin-commonjs
-    
-    # Verify all required dependencies are installed
-    echo -e "${BLUE}🔍 Verifying all dependencies are installed...${NC}"
-    if ! npm list autoprefixer postcss rollup rollup-plugin-terser rollup-plugin-postcss rollup-plugin-node-resolve rollup-plugin-commonjs @rollup/plugin-json @rollup/plugin-node-resolve @rollup/plugin-commonjs &>/dev/null; then
-        echo -e "${YELLOW}⚠️  Some dependencies are still missing, trying a full reinstall...${NC}"
+
+    echo -e "${BLUE}📥 Installing all project dependencies (including dev)...${NC}"
+    npm install --no-fund --no-audit || error_exit "npm install failed"
+
+    echo -e "${BLUE}📦 Ensuring required dev dependencies are present...${NC}"
+    npm install --save-dev \
+        autoprefixer \
+        postcss \
+        rollup \
+        rollup-plugin-terser \
+        rollup-plugin-postcss \
+        rollup-plugin-node-resolve \
+        rollup-plugin-commonjs \
+        @rollup/plugin-json \
+        @rollup/plugin-node-resolve \
+        @rollup/plugin-commonjs || error_exit "dev dependencies failed to install"
+
+    echo -e "${BLUE}🔍 Verifying local dependency presence...${NC}"
+    MISSING=0
+    for pkg in autoprefixer postcss rollup rollup-plugin-terser rollup-plugin-postcss rollup-plugin-node-resolve rollup-plugin-commonjs @rollup/plugin-json @rollup/plugin-node-resolve @rollup/plugin-commonjs; do
+        if ! npm ls "$pkg" &>/dev/null; then
+            echo -e "${YELLOW}⚠️  Missing: $pkg${NC}"
+            MISSING=1
+        fi
+    done
+
+    if [ "$MISSING" -eq 1 ]; then
+        echo -e "${YELLOW}🔁 Re-attempting full install after cleaning node_modules...${NC}"
         rm -rf node_modules package-lock.json
-        npm install --no-fund --no-audit
+        npm install --no-fund --no-audit || error_exit "Final install failed"
     fi
-    
-    echo -e "${GREEN}✅ Dependencies installed successfully!${NC}"
+
+    echo -e "${GREEN}✅ All dependencies installed successfully!${NC}"
 }
 
-# Run the installation
+# Run it
 install_dependencies

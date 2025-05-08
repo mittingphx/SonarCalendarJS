@@ -153,7 +153,34 @@ export class ApiService {
   }
 }
 
+// Determine the base URL based on the environment
+const getApiBaseUrl = () => {
+  // In browser, we can use a data attribute, window variable, or relative path
+  if (typeof window !== 'undefined') {
+    // Check for a data attribute on the script tag
+    const scriptTag = document.currentScript || 
+      Array.from(document.getElementsByTagName('script')).find(script => 
+        script.src && script.src.includes('sonar-calendar')
+      );
+    
+    if (scriptTag && scriptTag.dataset.apiBaseUrl) {
+      return scriptTag.dataset.apiBaseUrl;
+    }
+    
+    // Check for a global variable
+    if (window.SONAR_CALENDAR_CONFIG && window.SONAR_CALENDAR_CONFIG.apiBaseUrl) {
+      return window.SONAR_CALENDAR_CONFIG.apiBaseUrl;
+    }
+    
+    // Default to relative path
+    return '/api';
+  }
+  
+  // In Node.js environment
+  return process.env.API_BASE_URL || '';
+};
+
 // Export a singleton instance
-export const apiService = new ApiService(process.env.API_BASE_URL || '');
+export const apiService = new ApiService(getApiBaseUrl());
 
 export default apiService;

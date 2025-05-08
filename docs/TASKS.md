@@ -187,14 +187,18 @@ AGENT CREATED TASKS SHOULD GO BELOW THIS LINE.  HUMAN CREATED TASKS SHOULD GO AB
 
 ## 8. Build and Deployment
 - [x] Build System
-  - [x] Created build.ps1 script for Windows
-  - [x] Added build.bat for easy execution
+  - [x] Created cross-platform `app.sh` CLI tool
+  - [x] Implemented build and test commands
+  - [x] Added support for full and minified builds
   - [x] Configured Rollup for bundling
-  - [x] Set up source maps for debugging
-  - [x] Created example HTML files for testing
+  - [x] Set up Babel for transpilation
+  - [x] Added source map generation
+  - [x] Implemented minification
+  - [x] Added PowerShell Core auto-installation for Linux
+  - [x] Implemented dependency management
+  - [x] Added directory management for builds
   - [x] Added CSS processing and minification
   - [x] Documented build output structure in BUILD.md
 - [ ] Deployment
   - [ ] Build process for production
   - [ ] Deployment documentation
-  - [ ] Versioning strategy

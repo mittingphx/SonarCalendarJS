@@ -62,6 +62,10 @@ body {
   --color-primary-hover: #2563eb;
   --color-primary-active: #1d4ed8;
   
+  
+    --color-text-secondary: #9ca3af;
+    --color-text-secondary-hover: #6b7280;
+  
   --color-text: #1f2937;
   --color-text-muted: #6b7280;
   --color-text-inverse: #ffffff;
@@ -72,7 +76,9 @@ body {
   
   --color-border: #e5e7eb;
   --color-border-hover: #d1d5db;
-  
+  --color-bg-elevated-hover: #4f6077;
+
+
   --color-success: #10b981;
   --color-warning: #f59e0b;
   --color-error: #ef4444;
@@ -114,6 +120,8 @@ body {
 
 .event-card {
   background-color: var(--color-bg-elevated);
+  background-image: url(../images/examples/quiver.jpg);
+
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: calc(var(--spacing-unit) * 2);
@@ -134,6 +142,7 @@ body {
 
 .event-card:hover,
 .event-card:focus {
+  background-image: none;
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
   border-color: var(--color-primary);

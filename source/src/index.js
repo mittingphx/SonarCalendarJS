@@ -53,9 +53,22 @@ function initSonarCalendar(options = {}) {
 }
 
 // Export the initialization function and main class
-window.SonarCalendar = {
+const SonarCalendarLib = {
   init: initSonarCalendar,
-  Calendar: SonarCalendar
+  Calendar: SonarCalendar,
+  VERSION: '1.0.0' // Add version info
 };
 
-export { SonarCalendar, initSonarCalendar };
+// For UMD/script tag usage
+if (typeof window !== 'undefined') {
+  window.SonarCalendar = SonarCalendarLib;
+}
+
+// For CommonJS
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = SonarCalendarLib;
+}
+
+// For ES modules
+export { SonarCalendar };
+export default SonarCalendarLib;

@@ -47,8 +47,27 @@ This document outlines the architecture of the Sonar Calendar JS project.
    - Optimistic updates for better UX
 
 ### Build System
-- Rollup for bundling
-- Babel for transpilation
+- **CLI Tool (`app.sh`)**
+  - Cross-platform build and test runner
+  - Supports both Windows and Linux/MacOS
+  - Color-coded console output
+  - Automatic dependency management
+  - Directory-aware execution
+
+- **Build Process**
+  - Rollup for bundling
+  - Babel for transpilation
+  - Source map generation
+  - CSS processing and minification
+  - Multiple output formats (full and minified)
+  - Automatic PowerShell Core installation on Linux
+
+- **Testing**
+  - Integrated test runner
+  - Support for full and minified builds
+  - Node.js test forwarding
+  - Example test pages
+  - Cross-platform test execution
 - Jest for testing
 - ESLint for code quality
 - Stylelint for CSS validation

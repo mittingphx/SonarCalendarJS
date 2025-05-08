@@ -567,6 +567,430 @@ class DatePicker {
 }
 
 /**
+ * API Service for Sonar Calendar
+ * Handles all API interactions with the calendar backend
+ */
+
+class ApiService {
+  /**
+   * Create a new ApiService instance
+   * @param {string} baseUrl - Base URL for the API
+   */
+  constructor(baseUrl = '') {
+    this.baseUrl = baseUrl;
+    this.cache = new Map();
+    this.cacheExpiry = 5 * 60 * 1000; // 5 minutes cache
+  }
+
+  /**
+   * Make a request to the API
+   * @private
+   */
+  async _request(endpoint, options = {}) {
+    const url = `${this.baseUrl}${endpoint}`;
+    const cacheKey = `${options.method || 'GET'}:${url}`;
+    const now = Date.now();
+
+    // Check cache first
+    if (options.method === 'GET' && this.cache.has(cacheKey)) {
+      const { data, timestamp } = this.cache.get(cacheKey);
+      if (now - timestamp < this.cacheExpiry) {
+        return data;
+      }
+      this.cache.delete(cacheKey);
+    }
+
+    try {
+      const response = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers,
+        },
+        ...options,
+      });
+
+      if (!response.ok) {
+        const error = new Error(`API request failed: ${response.statusText}`);
+        error.status = response.status;
+        throw error;
+      }
+
+      const data = await response.json();
+
+      // Cache GET requests
+      if (options.method === 'GET') {
+        this.cache.set(cacheKey, { data, timestamp: now });
+      }
+
+      return data;
+    } catch (error) {
+      console.error('API request failed:', error);
+      throw error;
+    }
+  }
+
+  // Events
+
+  /**
+   * Fetch all events
+   * @param {Object} [params] - Query parameters
+   * @returns {Promise<Array>} - Array of events
+   */
+  async getEvents(params = {}) {
+    const query = new URLSearchParams(params).toString();
+    return this._request(`/api/events${query ? `?${query}` : ''}`);
+  }
+
+  /**
+   * Fetch a single event by ID
+   * @param {string} id - Event ID
+   * @returns {Promise<Object>} - Event data
+   */
+  async getEvent(id) {
+    return this._request(`/api/events/${id}`);
+  }
+
+  /**
+   * Create a new event
+   * @param {Object} eventData - Event data
+   * @returns {Promise<Object>} - Created event data
+   */
+  async createEvent(eventData) {
+    return this._request('/api/events', {
+      method: 'POST',
+      body: JSON.stringify(eventData),
+    });
+  }
+
+  /**
+   * Update an existing event
+   * @param {string} id - Event ID
+   * @param {Object} updates - Fields to update
+   * @returns {Promise<Object>} - Updated event data
+   */
+  async updateEvent(id, updates) {
+    return this._request(`/api/events/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(updates),
+    });
+  }
+
+  /**
+   * Delete an event
+   * @param {string} id - Event ID
+   * @returns {Promise<Object>} - Confirmation
+   */
+  async deleteEvent(id) {
+    return this._request(`/api/events/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Categories
+
+  /**
+   * Fetch all categories
+   * @returns {Promise<Array>} - Array of categories
+   */
+  async getCategories() {
+    return this._request('/api/categories');
+  }
+
+  /**
+   * Create a new category
+   * @param {Object} categoryData - Category data
+   * @returns {Promise<Object>} - Created category data
+   */
+  async createCategory(categoryData) {
+    return this._request('/api/categories', {
+      method: 'POST',
+      body: JSON.stringify(categoryData),
+    });
+  }
+
+  // Search
+
+  /**
+   * Search events
+   * @param {string} query - Search query
+   * @param {Object} [params] - Additional search parameters
+   * @returns {Promise<Array>} - Matching events
+   */
+  async searchEvents(query, params = {}) {
+    return this._request(`/api/search?q=${encodeURIComponent(query)}&${new URLSearchParams(params)}`);
+  }
+}
+
+// Determine the base URL based on the environment
+const getApiBaseUrl = () => {
+  // In browser, we can use a data attribute, window variable, or relative path
+  if (typeof window !== 'undefined') {
+    // Check for a data attribute on the script tag
+    const scriptTag = document.currentScript || 
+      Array.from(document.getElementsByTagName('script')).find(script => 
+        script.src && script.src.includes('sonar-calendar')
+      );
+    
+    if (scriptTag && scriptTag.dataset.apiBaseUrl) {
+      return scriptTag.dataset.apiBaseUrl;
+    }
+    
+    // Check for a global variable
+    if (window.SONAR_CALENDAR_CONFIG && window.SONAR_CALENDAR_CONFIG.apiBaseUrl) {
+      return window.SONAR_CALENDAR_CONFIG.apiBaseUrl;
+    }
+    
+    // Default to relative path
+    return '/api';
+  }
+  
+  // In Node.js environment
+  return process.env.API_BASE_URL || '';
+};
+
+// Export a singleton instance
+const apiService = new ApiService(getApiBaseUrl());
+
+/**
+ * Event Service for Sonar Calendar
+ * Handles event-related operations and caching
+ */
+
+class EventService {
+  constructor() {
+    this.eventsCache = new Map();
+    this.categoriesCache = null;
+    this.cacheExpiry = 5 * 60 * 1000; // 5 minutes cache
+    this.lastFetchTime = 0;
+  }
+
+  /**
+   * Get all events with optional filtering
+   * @param {Object} [filters] - Filter criteria
+   * @returns {Promise<Array>} - Array of events
+   */
+  async getEvents(filters = {}) {
+    try {
+      const cacheKey = this._generateCacheKey('events', filters);
+      const now = Date.now();
+
+      // Return cached data if available and not expired
+      if (this.eventsCache.has(cacheKey)) {
+        const { data, timestamp } = this.eventsCache.get(cacheKey);
+        if (now - timestamp < this.cacheExpiry) {
+          return data;
+        }
+      }
+
+      // Fetch from API
+      const events = await apiService.getEvents(filters);
+      
+      // Update cache
+      this.eventsCache.set(cacheKey, {
+        data: events,
+        timestamp: now
+      });
+
+      return events;
+    } catch (error) {
+      console.error('Failed to fetch events:', error);
+      throw error;
+    }
+  }
+
+
+  /**
+   * Get a single event by ID
+   * @param {string} id - Event ID
+   * @returns {Promise<Object>} - Event data
+   */
+  async getEvent(id) {
+    try {
+      // Check cache first
+      for (const { data } of this.eventsCache.values()) {
+        const cachedEvent = Array.isArray(data) 
+          ? data.find(event => event.id === id)
+          : null;
+        if (cachedEvent) return cachedEvent;
+      }
+
+      // If not in cache, fetch from API
+      return await apiService.getEvent(id);
+    } catch (error) {
+      console.error(`Failed to fetch event ${id}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Create a new event
+   * @param {Object} eventData - Event data
+   * @returns {Promise<Object>} - Created event
+   */
+  async createEvent(eventData) {
+    try {
+      const newEvent = await apiService.createEvent(eventData);
+      this._invalidateCache();
+      return newEvent;
+    } catch (error) {
+      console.error('Failed to create event:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update an existing event
+   * @param {string} id - Event ID
+   * @param {Object} updates - Fields to update
+   * @returns {Promise<Object>} - Updated event
+   */
+  async updateEvent(id, updates) {
+    try {
+      const updatedEvent = await apiService.updateEvent(id, updates);
+      this._invalidateCache();
+      return updatedEvent;
+    } catch (error) {
+      console.error(`Failed to update event ${id}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete an event
+   * @param {string} id - Event ID
+   * @returns {Promise<void>}
+   */
+  async deleteEvent(id) {
+    try {
+      await apiService.deleteEvent(id);
+      this._invalidateCache();
+    } catch (error) {
+      console.error(`Failed to delete event ${id}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get all categories
+   * @returns {Promise<Array>} - Array of categories
+   */
+  async getCategories() {
+    try {
+      const now = Date.now();
+      
+      // Return cached categories if available and not expired
+      if (this.categoriesCache && now - this.lastFetchTime < this.cacheExpiry) {
+        return this.categoriesCache;
+      }
+
+      // Fetch from API
+      const categories = await apiService.getCategories();
+      
+      // Update cache
+      this.categoriesCache = categories;
+      this.lastFetchTime = now;
+      
+      return categories;
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Search events
+   * @param {string} query - Search query
+   * @param {Object} [options] - Search options
+   * @returns {Promise<Array>} - Matching events
+   */
+  async searchEvents(query, options = {}) {
+    try {
+      return await apiService.searchEvents(query, options);
+    } catch (error) {
+      console.error('Search failed:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Invalidate all cached data
+   */
+  _invalidateCache() {
+    this.eventsCache.clear();
+    this.categoriesCache = null;
+  }
+
+  /**
+   * Generate a cache key from filter criteria
+   * @private
+   */
+  _generateCacheKey(prefix, filters) {
+    return `${prefix}:${JSON.stringify(filters)}`;
+  }
+}
+
+// Export a singleton instance
+const eventService = new EventService();
+
+/**
+ * Error handling utility for API responses
+ */
+
+class ApiError extends Error {
+  /**
+   * Create a new API error
+   * @param {string} message - Error message
+   * @param {number} [status] - HTTP status code
+   * @param {Object} [details] - Additional error details
+   */
+  constructor(message, status = 500, details = {}) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.details = details;
+  }
+}
+
+/**
+ * Handle API errors consistently
+ * @param {Error} error - The error to handle
+ * @param {string} [context] - Additional context for the error
+ * @throws {ApiError}
+ */
+function handleApiError(error, context = '') {
+  if (error instanceof ApiError) {
+    // Re-throw our custom errors
+    throw error;
+  }
+
+  // Handle network errors
+  if (error.name === 'TypeError' && error.message.includes('fetch')) {
+    throw new ApiError(
+      'Network error: Unable to connect to the server',
+      0,
+      { originalError: error.message, context }
+    );
+  }
+
+  // Handle HTTP errors
+  if (error.status) {
+    const message = error.message || 'An unknown error occurred';
+    throw new ApiError(
+      message,
+      error.status,
+      { originalError: error, context }
+    );
+  }
+
+  // Handle other errors
+  throw new ApiError(
+    error.message || 'An unexpected error occurred',
+    error.status || 500,
+    { originalError: error, context }
+  );
+}
+
+/**
  * Sonar Calendar - Main Calendar Component
  * 
  * This is the main calendar component that handles the overall calendar state,
@@ -904,17 +1328,16 @@ class SonarCalendar {
   /**
    * Parse events from a data source
    * @param {string} source - The source of the data ('api' or 'element')
+   * @param {Object} [filters] - Optional filters to apply
    * @returns {Promise<Array>} - Parsed events array
    * @private
    */
-  async parseEvents(source) {
+  async parseEvents(source, filters = {}) {
     try {
       if (source === 'api' && this.apiUrl) {
-        const response = await fetch(this.apiUrl);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return await response.json();
+        // Use the event service to fetch events
+        const events = await eventService.getEvents(filters);
+        return this.processEvents(events);
       } else if (source === 'element' && this.dataSelector) {
         const element = document.querySelector(this.dataSelector);
         if (!element) {
@@ -927,7 +1350,8 @@ class SonarCalendar {
           throw new Error('No data found in the specified element');
         }
         
-        return JSON.parse(data);
+        const events = JSON.parse(data);
+        return this.processEvents(events);
       }
       return [];
     } catch (error) {
@@ -937,9 +1361,34 @@ class SonarCalendar {
   }
 
   /**
-   * Load events from the available data source
+   * Process events data
+   * @param {Array} events - Array of event objects
+   * @returns {Array} - Processed events
+   * @private
    */
-  async loadEvents() {
+  processEvents(events) {
+    if (!Array.isArray(events)) {
+      console.warn('Expected an array of events, got:', events);
+      return [];
+    }
+
+    return events.map(event => ({
+      id: event.id || `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      title: event.title || 'Untitled Event',
+      start: event.start ? new Date(event.start) : new Date(),
+      end: event.end ? new Date(event.end) : new Date(),
+      description: event.description || '',
+      location: event.location || '',
+      category: event.category || 'default',
+      ...event
+    }));
+  }
+
+  /**
+   * Load events from the available data source
+   * @param {Object} [filters] - Optional filters to apply
+   */
+  async loadEvents(filters = {}) {
     this.isLoading = true;
     this.error = null;
     this.updateLoadingState();
@@ -947,11 +1396,11 @@ class SonarCalendar {
     try {
       // Try to load from API first if available
       if (this.apiUrl) {
-        this.events = await this.parseEvents('api');
+        this.events = await this.parseEvents('api', filters);
       } 
       // If no API URL or API failed, try loading from data element if specified
       else if (this.dataSelector) {
-        this.events = await this.parseEvents('element');
+        this.events = await this.parseEvents('element', filters);
       } else {
         this.events = [];
         console.warn('No data source specified. Provide either apiUrl or dataSelector.');
@@ -959,7 +1408,7 @@ class SonarCalendar {
       
       this.updateCalendar();
     } catch (error) {
-      console.error('Error loading events:', error);
+      handleApiError(error, 'Loading events');
       this.error = error.message;
       this.showError(error.message);
     } finally {
@@ -1220,10 +1669,21 @@ function initSonarCalendar(options = {}) {
 }
 
 // Export the initialization function and main class
-window.SonarCalendar = {
+const SonarCalendarLib = {
   init: initSonarCalendar,
-  Calendar: SonarCalendar
+  Calendar: SonarCalendar,
+  VERSION: '1.0.0' // Add version info
 };
 
-export { SonarCalendar, initSonarCalendar };
+// For UMD/script tag usage
+if (typeof window !== 'undefined') {
+  window.SonarCalendar = SonarCalendarLib;
+}
+
+// For CommonJS
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = SonarCalendarLib;
+}
+
+export { SonarCalendar, SonarCalendarLib as default };
 //# sourceMappingURL=sonar-calendar.esm.js.map
