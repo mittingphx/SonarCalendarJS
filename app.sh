@@ -86,24 +86,22 @@ install_powershell_linux() {
 # Install build dependencies
 install_build_deps() {
     local original_dir="$(pwd)"
+    local root_dir="${SCRIPT_DIR}"
     
     echo -e "${BLUE}🔧 Installing build dependencies...${NC}"
     
-    # Convert WSL path to Windows path if running under WSL
-    local source_dir="${SOURCE_DIR}"
-    if [[ "${source_dir}" == "/mnt/"* ]]; then
-        # Convert /mnt/c/... to C:/...
-        source_dir="${source_dir#/mnt/}"  # Remove /mnt/
-        source_dir="${source_dir:0:1}:${source_dir:1}"  # Add : after drive letter
-        source_dir="${source_dir////\\}"  # Replace / with \
+    # Check if package.json exists in source directory, if not use root directory
+    if [ ! -f "${SOURCE_DIR}/package.json" ] && [ -f "${root_dir}/package.json" ]; then
+        echo -e "${YELLOW}⚠️  package.json not found in source directory, using root directory${NC}"
+        cd "${root_dir}" || error_exit "Failed to change to root directory"
+    else
+        # Change to source directory
+        cd "${SOURCE_DIR}" || error_exit "Failed to change to source directory"
     fi
     
-    # Change to source directory
-    cd "${SOURCE_DIR}" || error_exit "Failed to change to source directory"
-    
-    # Check if we're in the correct directory
+    # Verify we have a package.json in the current directory
     if [ ! -f "package.json" ]; then
-        error_exit "package.json not found in ${SOURCE_DIR}. Current directory: $(pwd)"
+        error_exit "package.json not found in $(pwd)"
     fi
     
     echo -e "${BLUE}📦 Installing dependencies in $(pwd)...${NC}"
@@ -142,9 +140,10 @@ install_build_deps() {
 # Build the project
 build_project() {
     local original_dir="$(pwd)"
+    local root_dir="${SCRIPT_DIR}"
     
     # Ensure we're in the project root
-    cd "${SCRIPT_DIR}" || error_exit "Failed to change to project root"
+    cd "${root_dir}" || error_exit "Failed to change to project root"
     
     echo -e "${BLUE}🚀 Building project...${NC}"
     
@@ -171,10 +170,12 @@ build_project() {
             fi
         fi
         
-        # Convert WSL path to Windows path if running under WSL
+        # Determine the correct path for the build script
         local build_script_path="${SOURCE_DIR}/build"
+        
+        # Convert WSL path to Windows path if running under WSL
         if [[ "${build_script_path}" == "/mnt/"* ]]; then
-            # Convert /mnt/c/... to C:\...
+            # Convert /mnt/c/... to C:\\...
             build_script_path="${build_script_path#/mnt/}"  # Remove /mnt/
             build_script_path="${build_script_path:0:1}:${build_script_path:1}"  # Add : after drive letter
             build_script_path="${build_script_path////\\}"  # Replace / with \
@@ -183,8 +184,12 @@ build_project() {
         # Run PowerShell build script
         echo -e "${BLUE}📦 Running build script from: ${build_script_path}${NC}"
         
-        # Change to source directory first
-        cd "${SOURCE_DIR}" || error_exit "Failed to change to source directory"
+        # Change to the directory containing package.json
+        if [ -f "${root_dir}/package.json" ]; then
+            cd "${root_dir}" || error_exit "Failed to change to root directory"
+        else
+            cd "${SOURCE_DIR}" || error_exit "Failed to change to source directory"
+        fi
         
         # Run the build script
         if ! pwsh -ExecutionPolicy Bypass -File "${build_script_path}\\build.ps1"; then
