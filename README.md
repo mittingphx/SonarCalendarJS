@@ -3,6 +3,10 @@
 ## Project Overview
 Sonar Calendar JS is a lightweight, customizable calendar component for displaying events. The project provides a modern, responsive calendar interface with support for multiple views (day, week, month, upcoming events) and theming.
 
+## Quick Demo
+You can view this event list library on GitHub Pages at [example-full.html](https://mittingphx.github.io/SonarCalendarJS/source/dist/example-full.html) and [example-minified](https://mittingphx.github.io/SonarCalendarJS/source/dist/example-minified.html)
+
+
 ## Features
 - [x] Multiple calendar views (day, week, month, upcoming events)
 - [x] Event management (add, edit, delete)
