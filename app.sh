@@ -85,20 +85,47 @@ install_powershell_linux() {
 
 # Install build dependencies
 install_build_deps() {
+    local original_dir="$(pwd)"
+    
     echo -e "${BLUE}🔧 Installing build dependencies...${NC}"
+    
+    # Convert WSL path to Windows path if running under WSL
+    local source_dir="${SOURCE_DIR}"
+    if [[ "${source_dir}" == "/mnt/"* ]]; then
+        # Convert /mnt/c/... to C:/...
+        source_dir="${source_dir#/mnt/}"  # Remove /mnt/
+        source_dir="${source_dir:0:1}:${source_dir:1}"  # Add : after drive letter
+        source_dir="${source_dir////\\}"  # Replace / with \
+    fi
+    
+    # Change to source directory
     cd "${SOURCE_DIR}" || error_exit "Failed to change to source directory"
     
+    # Check if we're in the correct directory
+    if [ ! -f "package.json" ]; then
+        error_exit "package.json not found in ${SOURCE_DIR}. Current directory: $(pwd)"
+    fi
+    
+    echo -e "${BLUE}📦 Installing dependencies in $(pwd)...${NC}"
+    
+    # Clean npm cache to avoid potential issues
+    echo -e "${BLUE}🧹 Cleaning npm cache...${NC}"
+    npm cache clean --force
+    
     # Install dependencies
+    echo -e "${BLUE}📥 Installing dependencies...${NC}"
     if ! npm install --no-fund --no-audit; then
         error_exit "Failed to install dependencies"
     fi
     
     # Install dev dependencies
+    echo -e "${BLUE}📥 Installing dev dependencies...${NC}"
     if ! npm install --save-dev --no-fund --no-audit; then
         error_exit "Failed to install dev dependencies"
     fi
     
     # Install any missing dependencies from package.json
+    echo -e "${BLUE}🔍 Verifying dependencies...${NC}"
     if [ -f "package.json" ]; then
         if ! npm ci --no-fund --no-audit; then
             echo -e "${YELLOW}⚠️  'npm ci' failed, trying 'npm install'...${NC}"
@@ -108,7 +135,8 @@ install_build_deps() {
         fi
     fi
     
-    cd - > /dev/null || error_exit "Failed to return to original directory"
+    # Return to original directory
+    cd "${original_dir}" || error_exit "Failed to return to original directory"
 }
 
 # Build the project
@@ -143,9 +171,23 @@ build_project() {
             fi
         fi
         
+        # Convert WSL path to Windows path if running under WSL
+        local build_script_path="${SOURCE_DIR}/build"
+        if [[ "${build_script_path}" == "/mnt/"* ]]; then
+            # Convert /mnt/c/... to C:\...
+            build_script_path="${build_script_path#/mnt/}"  # Remove /mnt/
+            build_script_path="${build_script_path:0:1}:${build_script_path:1}"  # Add : after drive letter
+            build_script_path="${build_script_path////\\}"  # Replace / with \
+        fi
+        
         # Run PowerShell build script
-        cd "${SOURCE_DIR}/build" || error_exit "Failed to change to build directory"
-        if ! pwsh -ExecutionPolicy Bypass -File "$(basename "$BUILD_SCRIPT")"; then
+        echo -e "${BLUE}📦 Running build script from: ${build_script_path}${NC}"
+        
+        # Change to source directory first
+        cd "${SOURCE_DIR}" || error_exit "Failed to change to source directory"
+        
+        # Run the build script
+        if ! pwsh -ExecutionPolicy Bypass -File "${build_script_path}\\build.ps1"; then
             cd "$original_dir"
             error_exit "Build script failed"
         fi
