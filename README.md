@@ -91,6 +91,10 @@ SonarCalendarJS/
   - **/examples/**: Example HTML and data
   - **/src/**: Source code (components, services, styles, tests)
 
+## Mockups & Static Assets
+
+The `/mockup` directory contains all static reference assets, original UI design mockups, and a Node.js reference implementation. Due to size, this folder is distributed as `mockup.zip` in the root of the repository. Unzip to access the full set of mockups and static assets for reference only (do not modify).
+
 ## Getting Started
 
 1. **Clone the repository**
@@ -146,6 +150,13 @@ Please see `CONTRIBUTING.md` for more information (to be added).
 ## License
 
 **Private use only.** This project is currently not open source, but we intend to release it under an open source license in the future. Please contact the maintainers for more information.
+
+## 🧭 Related Repositories
+
+- [@mittingphx/sonar-az](https://github.com/mitttingphx/sonar-az) – Frontend and backend code for the SONAR AZ website
+- [@petcom/calendar-api-node-mvp](https://github.com/petcom/calendar-api-node-mvp) – Node-based calendar API backend with Ghost CMS integration
+
+> This project is part of SONAR, a noise event series held by Sonanant Resonante Therapy NLabs.
 
 ## Support
 
