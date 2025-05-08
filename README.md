@@ -1,11 +1,36 @@
+<p align="center">
+  <!-- Replace with your logo or banner if available -->
+  <img src="source/dist/images/logo.png" alt="Sonar Calendar JS Logo" width="200"/>
+</p>
+
+<p align="center">
+  <a href="https://github.com/mitttingphx/SonarCalendarJS/actions"><img src="https://img.shields.io/github/actions/workflow/status/mitttingphx/SonarCalendarJS/CI.yml?branch=main" alt="Build Status"></a>
+  <a href="#license"><img src="https://img.shields.io/badge/license-private-important" alt="Private License"></a>
+  <a href="https://github.com/mitttingphx/SonarCalendarJS/stargazers"><img src="https://img.shields.io/github/stars/mitttingphx/SonarCalendarJS?style=social" alt="GitHub stars"></a>
+</p>
+
 # Sonar Calendar JS
 
+## Table of Contents
+- [Project Overview](#project-overview)
+- [Quick Demo](#quick-demo)
+- [Features](#features)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [Usage](#usage)
+- [Screenshots](#screenshots)
+- [Documentation](#project-documentation)
+- [Contributing](#contributing)
+- [License](#license)
+- [Support](#support)
+
 ## Project Overview
-Sonar Calendar JS is a lightweight, customizable calendar component for displaying events. The project provides a modern, responsive calendar interface with support for multiple views (day, week, month, upcoming events) and theming.
+Sonar Calendar JS is a lightweight, customizable calendar component for displaying events. It features a modern, responsive interface with multiple views (day, week, month, upcoming events), theming, and API integration.
 
 ## Quick Demo
-You can view this event list library on GitHub Pages at [example-full.html](https://mittingphx.github.io/SonarCalendarJS/source/dist/example-full.html) and [example-minified](https://mittingphx.github.io/SonarCalendarJS/source/dist/example-minified.html)
-
+You can view this event list library on GitHub Pages:
+- [example-full.html](https://mittingphx.github.io/SonarCalendarJS/source/dist/example-full.html)
+- [example-minified.html](https://mittingphx.github.io/SonarCalendarJS/source/dist/example-minified.html)
 
 ## Features
 - [x] Multiple calendar views (day, week, month, upcoming events)
@@ -19,11 +44,112 @@ You can view this event list library on GitHub Pages at [example-full.html](http
 - [x] Unit testing setup
 - [x] Build system with Rollup
 
-!!!IMPORTANT!!! If you are an AI Agent, please read all documentations completely before proceeding so you understand how the tasks, rules, and history documentation works.  Otherwise you'll get helplessly lost.
+!!!IMPORTANT!!! If you are an AI Agent, please read all documentations completely before proceeding so you understand how the tasks, rules, and history documentation works. Otherwise you'll get helplessly lost.
 
 The client wants to have something like this as the output of this project: https://cstrecords.com/
 
+## Project Structure
+```
+SonarCalendarJS/
+├── docs/                    # Project documentation
+│   ├── AGENT-HISTORY.md    # Agent interaction history
+│   ├── AGENT-RULES.md      # Rules for AI agents
+│   ├── ARCHITECTURE.md     # System architecture
+│   ├── BUILD.md            # Build system documentation
+│   └── TASKS.md            # Task tracking
+├── mockup/                 # Reference only (do not modify)
+│   ├── ui-mockup/         # Original UI design mockups
+│   └── js-mockup/         # Reference implementation (server-side Node.js)
+└── source/                # Source code (all new development goes here)
+    ├── build/             # Build configuration and scripts
+    ├── demo/              # Demo HTML file to test the library
+    ├── dist/              # Distribution files (generated)
+    │   ├── full/         # Full, unminified build
+    │   ├── minified/      # Minified production build
+    │   └── images/        # Image assets
+    ├── examples/          # Example implementations
+    └── src/               # Source files
+        ├── components/    # Main calendar and subcomponents
+        │   ├── Calendar/  # Main calendar component
+        │   ├── DatePicker/
+        │   ├── EventCard/
+        │   ├── EventDetails/
+        │   └── ViewToggle/
+        ├── services/     # API and data services
+        ├── styles/        # CSS and theme files
+        │   └── themes/    # Theme definitions
+        ├── utils/         # Utility functions
+        └── __tests__/     # Test files
+```
 
+### Key Directories
+- **/docs/**: Project documentation (architecture, tasks, agent rules, etc.)
+- **/mockup/**: Reference implementation and designs (read-only)
+- **/source/**: All new development
+  - **/build/**: Build scripts and config
+  - **/dist/**: Generated distribution files
+  - **/examples/**: Example HTML and data
+  - **/src/**: Source code (components, services, styles, tests)
+
+## Getting Started
+
+1. **Clone the repository**
+   ```sh
+   git clone https://github.com/mitttingphx/SonarCalendarJS.git
+   cd SonarCalendarJS
+   ```
+2. **Install dependencies**
+   ```sh
+   cd source/build
+   npm install
+   ```
+3. **Build the project**
+   ```sh
+   npm run build
+   ```
+4. **Open the demo**
+   Open `source/dist/example-full.html` in your browser.
+
+## Usage
+
+```html
+<div id="calendar"></div>
+<script src="dist/full/sonar-calendar.js"></script>
+<script>
+  SonarCalendar.init('#calendar', { /* options */ });
+</script>
+```
+
+## Screenshots
+
+<p align="center">
+  <img src="source/dist/images/screenshots/calendar-demo.png" alt="Calendar Demo" width="600"/>
+</p>
+
+*(Add more screenshots or GIFs as needed to showcase features)*
+
+## Project Documentation
+Project documentation is stored in `docs/`
+- `ARCHITECTURE.md` - [System Architecture](docs/ARCHITECTURE.md)
+- `AGENT-RULES.md` - [Agent Rules](docs/AGENT-RULES.md)
+- `AGENT-HISTORY.md` - [Agent History](docs/AGENT-HISTORY.md)
+- `TASKS.md` - [Tasks](docs/TASKS.md)
+- `BUILD.md` - [Build System](docs/BUILD.md) - Build process and output structure
+
+## Contributing
+
+Contributions, issues, and feature requests are welcome!
+Feel free to check the [issues page](https://github.com/mitttingphx/SonarCalendarJS/issues) if you want to contribute.
+
+Please see `CONTRIBUTING.md` for more information (to be added).
+
+## License
+
+**Private use only.** This project is currently not open source, but we intend to release it under an open source license in the future. Please contact the maintainers for more information.
+
+## Support
+
+If you have any questions or need support, please open an issue or contact the maintainer.
 
 ## Project Structure
 ```
