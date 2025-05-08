@@ -1,71 +1,61 @@
 # AGENT-HISTORY.md
 
-This file is used to store the history of the agent's work.
-
-Please use both date and time when adding to the history.
+This file is used to store the history of the agent's work, organized by date with the oldest entries first.
 
 ## History
-- 2025-05-06 12:00 - Initial agent creation and rules
-- 2025-05-06 12:30 - Project Analysis Phase 1:
+
+### 2025-05-06 - Project Initialization and Setup
+
+- **Agent Creation and Rules**
+  - Initial agent creation and configuration
+  - Set up project rules and guidelines
+
+- **Project Analysis Phase 1**
   - Reviewed UI mockups and music player demo
   - Documented calendar features and components
   - Identified required API endpoints and data structures
   - Created initial task list in TASKS.md
-- 2025-05-06 13:15 - Project Structure Setup:
+
+- **Project Structure Setup**
   - Created source directory structure
   - Set up build process with Rollup
   - Configured development environment
   - Created base styles and theme system
   - Implemented initial calendar component
   - Set up demo page
-- 2025-05-06 19:30 - Build System Reorganization:
+
+- **Build System Reorganization**
   - Moved build system to /source/build directory
   - Created build.ps1 script for Windows
   - Added build.bat for easy execution
   - Updated documentation for new build process
   - Ensured build system is self-contained
-- 2025-05-06 20:00 - Build System Fixes:
   - Fixed Node.js path resolution issues
   - Resolved Rollup and dependency version conflicts
   - Successfully built project with Rollup
   - Generated UMD and ES module bundles with source maps
-- 2025-05-06 20:15 - Build System Reorganization:
   - Restructured build output into `full/` and `minified/` directories
   - Created example HTML files for both full and minified versions
   - Updated build process to handle CSS files and source maps
   - Added cleanup of temporary build files
   - Documented build output structure in BUILD.md
-- 2025-05-06 20:20 - Data Loading Enhancements:
+
+- **Data Loading Enhancements**
   - Added support for loading events from DOM elements using `dataSelector`
   - Implemented fallback mechanism (API → DOM element)
   - Added example data sources in both full and minified examples
   - Updated documentation with data loading options and examples
   - Added error handling for data parsing
-- 2025-05-06 22:00 - View Toggle Implementation:
+
+- **View Toggle Implementation**
   - Created ViewToggle component with theme support
   - Added view switching between 'upcoming', 'month', 'week', and 'day' views
   - Set 'upcoming' as the default view
   - Added proper event handling for view changes
   - Ensured proper state management for each view
   - Updated example files to demonstrate view toggles
-- 2025-05-07 09:30 - API Integration and Testing Setup:
-  - Implemented API service layer with caching
-  - Created EventService for event management
-  - Added error handling utilities
-  - Set up Jest testing environment
-  - Created test utilities and mocks
-  - Added unit tests for Calendar component
-  - Updated documentation for API usage
-  - Added test coverage reporting
-  - Integrated API service with Calendar component
-  - Implemented event processing and validation
-  - Added support for filtering and pagination
-  - Updated build system to include test dependencies
-  - Created mock data for testing
-  - Added test coverage thresholds
-  - Set up continuous integration configuration
 
-- 2025-05-06 22:30 - Build and Deployment Fixes:
+- **Build and Deployment Fixes**
   - Fixed CSS import paths for component styles
   - Ensured all component styles are properly included in the build
   - Verified proper theming across all components
@@ -77,7 +67,7 @@ Please use both date and time when adding to the history.
   - Fixed accessibility issues with event cards and popups
   - Verified cross-browser compatibility for all styles
 
-- 2025-05-06 23:45 - DatePicker Implementation:
+- **DatePicker Implementation**
   - Created DatePicker component with month navigation
   - Integrated DatePicker into calendar header
   - Added date selection handling
@@ -93,16 +83,68 @@ Please use both date and time when adding to the history.
   - Added proper error handling for view changes
   - Ensured proper initialization of view toggles
   - Added console logging for debugging view changes
-- 2025-05-06 22:45 - Git Repository Setup:
+
+- **Git Repository Setup**
   - Initialized git repository
   - Created .gitignore file with proper exclusions
   - Added all project files to git
   - Created initial commit with all current changes
   - Documented build and run instructions in README.md
-- 2025-05-06 23:00 - Bug Fixes and Polish:
+
+- **Bug Fixes and Polish**
   - Fixed theme application in Calendar.js
   - Updated example files to use correct initialization
   - Added proper error handling for view changes
   - Ensured all components are properly documented
   - Updated TASKS.md to reflect completed work
 
+### 2025-05-07 - API Integration and CLI Tool Development
+
+- **API Integration and Testing**
+  - **API Service Implementation**
+    - Created `apiService.js` with caching and error handling
+    - Implemented request retry logic and response validation
+    - Added support for different API endpoints
+    - Set up request/response interceptors
+
+  - **Event Service**
+    - Developed `eventService.js` for event management
+    - Implemented CRUD operations for events
+    - Added data transformation and normalization
+    - Integrated with API service for data fetching
+
+  - **Testing Environment**
+    - Set up Jest with JSDOM for browser-like testing
+    - Added testing utilities in `test-utils.js`
+    - Created mock services for testing
+    - Configured test coverage reporting
+
+  - **Component Testing**
+    - Added comprehensive tests for Calendar component
+    - Implemented snapshot testing
+    - Added event handling tests
+    - Tested edge cases and error states
+
+  - **Infrastructure**
+    - Added Jest configuration with custom setup
+    - Set up Babel for modern JavaScript features
+    - Configured code coverage thresholds
+    - Updated build process to include test artifacts
+
+  - **Documentation**
+    - Updated architecture documentation
+    - Added testing guidelines
+    - Documented API integration patterns
+    - Added JSDoc for all new services and utilities
+
+- **CLI Tool Development**
+  - Created cross-platform `app.sh` CLI tool with build and test commands
+  - Implemented support for full and minified test builds
+  - Added Node.js test runner integration for running specific test suites
+  - Added automatic PowerShell Core installation for Linux systems
+  - Implemented directory management to ensure proper working directory handling
+  - Enhanced error handling with color-coded console output
+  - Added dependency management for build process
+  - Created help system with usage examples and command documentation
+  - Updated build system documentation in ARCHITECTURE.md
+  - Added cross-platform support for Windows and Linux/MacOS

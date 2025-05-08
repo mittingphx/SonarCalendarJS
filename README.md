@@ -65,6 +65,64 @@ This project involves:
 
 ## Development
 
+### CLI Tool
+
+The project includes a cross-platform CLI tool (`app.sh`) to simplify common development tasks. The tool provides a consistent interface for building and testing across different operating systems.
+
+#### Features
+- Build the project with a single command
+- Run tests with various options
+- Support for both full and minified builds
+- Node.js test runner integration
+- Automatic dependency management
+- Cross-platform support (Windows, Linux, macOS)
+
+#### Prerequisites
+- Bash shell (Linux/macOS) or WSL/Git Bash (Windows)
+- Node.js (v14 or higher)
+- npm (v6 or higher)
+- PowerShell Core (will be installed automatically on Linux if missing)
+
+#### Usage
+
+```bash
+./app.sh [command] [options]
+```
+
+##### Commands
+- `build` - Build the project
+- `test` - Run tests
+- `help` - Show help message
+
+##### Test Options
+- `full` - Run full test (example-full.html)
+- `minified` - Run minified test (example-minified.html)
+- `<pattern>` - Any other pattern will be passed to Node.js test runner
+
+##### Examples
+```bash
+# Build the project
+./app.sh build
+
+# Run all tests
+./app.sh test
+
+# Run tests matching a pattern
+./app.sh test Calendar
+
+# Run full test build
+./app.sh test full
+
+# Run minified test build
+./app.sh test minified
+
+# Run tests with specific options
+./app.sh test --coverage
+```
+
+##### Flags
+- `--nobuild` - Skip building before testing
+
 ### Build System
 
 The project uses a Node.js-based build system located in `/source/build/`. The build system is self-contained and doesn't require global Node.js installation.
