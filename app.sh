@@ -87,59 +87,31 @@ install_powershell_linux() {
 # Install build dependencies
 install_build_deps() {
     local original_dir="$(pwd)"
-    local root_dir="${BUILD_DIR}"
+    local build_script_path="${BUILD_DIR}/install_build_deps.sh"
     
     echo -e "${BLUE}🔧 Installing build dependencies...${NC}"
     
-    # Check if package.json exists in build directory only
-    if [ ! -f "${root_dir}/package.json" ]; then
+    # Check if package.json exists in build directory
+    if [ ! -f "${BUILD_DIR}/package.json" ]; then
         echo -e "${YELLOW}⚠️  package.json not found in build directory${NC}"
-        cd ${original_dir} || error_exit "Failed to change to original directory"
         error_exit "package.json must be in the build folder"
-    else
-        cd "${root_dir}" || error_exit "Failed to change to build directory"
     fi
     
-    # Verify we have a package.json in the current directory    
-    if [ ! -f "package.json" ]; then
-        error_exit "package.json not found in $(pwd)"
+    # Check if the build script exists
+    if [ ! -f "${build_script_path}" ]; then
+        error_exit "Build script not found at: ${build_script_path}"
     fi
     
-    echo -e "${BLUE}📦 Installing dependencies in $(pwd)...${NC}"
+    # Make the script executable
+    chmod +x "${build_script_path}" || error_exit "Failed to make build script executable"
     
-    # Clean npm cache to avoid potential issues
-    echo -e "${BLUE}🧹 Cleaning npm cache...${NC}"
-    npm cache clean --force
+    # Change to build directory and run the script
+    cd "${BUILD_DIR}" || error_exit "Failed to change to build directory"
     
-    # Install required global dependencies if missing
-    echo -e "${BLUE}🌍 Checking for global dependencies...${NC}"
-    if ! npm list -g autoprefixer postcss rollup rollup-plugin-terser rollup-plugin-postcss rollup-plugin-node-resolve rollup-plugin-commonjs @rollup/plugin-json @rollup/plugin-node-resolve @rollup/plugin-commonjs &>/dev/null; then
-        echo -e "${YELLOW}⚠️  Installing missing global dependencies...${NC}"
-        npm install -g autoprefixer postcss rollup rollup-plugin-terser rollup-plugin-postcss rollup-plugin-node-resolve rollup-plugin-commonjs @rollup/plugin-json @rollup/plugin-node-resolve @rollup/plugin-commonjs
-    fi
-    
-    # Install dependencies
-    echo -e "${BLUE}📥 Installing project dependencies...${NC}"
-    if ! npm install --no-fund --no-audit; then
-        error_exit "Failed to install dependencies"
-    fi
-    
-    # Install dev dependencies
-    echo -e "${BLUE}📥 Installing dev dependencies...${NC}"
-    if ! npm install --save-dev --no-fund --no-audit; then
-        error_exit "Failed to install dev dependencies"
-    fi
-    
-    # Install specific required dependencies
-    echo -e "${BLUE}📦 Installing required build dependencies...${NC}"
-    npm install --save-dev autoprefixer postcss rollup rollup-plugin-terser rollup-plugin-postcss rollup-plugin-node-resolve rollup-plugin-commonjs @rollup/plugin-json @rollup/plugin-node-resolve @rollup/plugin-commonjs
-    
-    # Verify all required dependencies are installed
-    echo -e "${BLUE}🔍 Verifying all dependencies are installed...${NC}"
-    if ! npm list autoprefixer postcss rollup rollup-plugin-terser rollup-plugin-postcss rollup-plugin-node-resolve rollup-plugin-commonjs @rollup/plugin-json @rollup/plugin-node-resolve @rollup/plugin-commonjs &>/dev/null; then
-        echo -e "${YELLOW}⚠️  Some dependencies are still missing, trying a full reinstall...${NC}"
-        rm -rf node_modules package-lock.json
-        npm install --no-fund --no-audit
+    echo -e "${BLUE}🚀 Running build dependency installation script...${NC}"
+    if ! ./install_build_deps.sh; then
+        cd "${original_dir}" || error_exit "Failed to return to original directory"
+        error_exit "Build dependency installation failed"
     fi
     
     # Return to original directory
