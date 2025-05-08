@@ -1,6 +1,6 @@
 <p align="center">
   <!-- Replace with your logo or banner if available -->
-  <img src="source/dist/images/logo.png" alt="Sonar Calendar JS Logo" width="200"/>
+  <img src="source/dist/images/SonarCalendarJsLogo.png" alt="Sonar Calendar JS Logo" width="200"/>
 </p>
 
 <p align="center">
